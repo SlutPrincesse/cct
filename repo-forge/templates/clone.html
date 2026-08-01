@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}RepoForge - Clone{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Clone Repository</h1>
+    <p>Clone a GitHub repository to analyze its code</p>
+</div>
+
+<div class="card">
+    <form id="cloneForm" class="form">
+        <div class="form-group">
+            <label>Repository URL</label>
+            <input type="text" name="repo_url" placeholder="https://github.com/user/repo.git" required>
+        </div>
+        <div class="form-group">
+            <label>Branch (optional)</label>
+            <input type="text" name="branch" placeholder="main">
+        </div>
+        <button type="submit" class="btn btn-primary">Clone Repository</button>
+    </form>
+    <div id="cloneStatus" class="status-message"></div>
+</div>
+
+<div class="card">
+    <h2>Cloned Repositories</h2>
+    {% if repos %}
+    <table class="table">
+        <thead><tr><th>Name</th><th>Branch</th><th>Commit</th><th>URL</th><th>Actions</th></tr></thead>
+        <tbody>
+        {% for repo in repos %}
+        <tr>
+            <td>{{ repo.name }}</td>
+            <td>{{ repo.branch }}</td>
+            <td><code>{{ repo.commit[:8] }}</code></td>
+            <td><a href="{{ repo.remote_url }}" target="_blank">View</a></td>
+            <td><button class="btn btn-danger btn-sm" onclick="deleteRepo('{{ repo.name }}')">Delete</button></td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="empty-state">No repositories cloned yet.</p>
+    {% endif %}
+</div>
+{% endblock %}

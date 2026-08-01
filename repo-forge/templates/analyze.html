@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}RepoForge - Analyze{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Analyze Repository</h1>
+    <p>Extract and index Python code units by Single Responsibility Principle</p>
+</div>
+
+<div class="card">
+    <form id="analyzeForm" class="form">
+        <div class="form-group">
+            <label>Repository</label>
+            <select name="repo_path" required>
+                <option value="">Select a repository</option>
+                {% for repo in repos %}
+                <option value="{{ repo.path }}">{{ repo.name }}</option>
+                {% endfor %}
+            </select>
+            <input type="hidden" name="repo_name" id="repoName">
+        </div>
+        <button type="submit" class="btn btn-primary">Analyze Code</button>
+    </form>
+    <div id="analyzeStatus" class="status-message"></div>
+</div>
+
+<div class="card" id="resultsCard" style="display:none;">
+    <h2>Analysis Results</h2>
+    <div id="resultsSummary"></div>
+    <table class="table" id="resultsTable">
+        <thead><tr><th>Name</th><th>Type</th><th>Description</th><th>Complexity</th></tr></thead>
+        <tbody id="resultsBody"></tbody>
+    </table>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('analyzeForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const repoPath = form.repo_path.value;
+    const repoName = repoPath.split('/').pop();
+    document.getElementById('repoName').value = repoName;
+
+    const status = document.getElementById('analyzeStatus');
+    status.innerHTML = '<div class="spinner"></div> Analyzing...';
+    status.className = 'status-message status-info';
+
+    const formData = new FormData();
+    formData.append('repo_path', repoPath);
+    formData.append('repo_name', repoName);
+
+    const res = await fetch('/api/analyze', { method: 'POST', body: formData });
+    const data = await res.json();
+
+    if (data.success) {
+        status.innerHTML = `Successfully analyzed ${data.count} units.`;
+        status.className = 'status-message status-success';
+        document.getElementById('resultsCard').style.display = 'block';
+        document.getElementById('resultsSummary').innerHTML = `<p>${data.count} units extracted and indexed.</p>`;
+        const tbody = document.getElementById('resultsBody');
+        tbody.innerHTML = data.units.map(u => `
+            <tr>
+                <td>${u.name}</td>
+                <td><span class="badge">${u.type}</span></td>
+                <td>${u.description}</td>
+                <td>${u.complexity}</td>
+            </tr>
+        `).join('');
+    } else {
+        status.innerHTML = data.message || 'Analysis failed';
+        status.className = 'status-message status-error';
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}RepoForge - Compile{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Compile APK</h1>
+    <p>Build your generated app as an Android APK</p>
+</div>
+
+<div class="card">
+    <table class="table">
+        <thead><tr><th>Name</th><th>Units</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>
+        {% for proj in projects %}
+        <tr>
+            <td>{{ proj.name }}</td>
+            <td>{{ proj.selected_units|length if proj.selected_units else 0 }}</td>
+            <td><span class="badge badge-{{ proj.build_status }}">{{ proj.build_status }}</span></td>
+            <td>
+                <form method="post" action="/api/compile" style="display:inline;">
+                    <input type="hidden" name="project_id" value="{{ proj.id }}">
+                    <button type="submit" class="btn btn-primary btn-sm" {% if proj.build_status == 'building' %}disabled{% endif %}>
+                        Build APK
+                    </button>
+                </form>
+            </td>
+        </tr>
+        {% if proj.build_log %}
+        <tr>
+            <td colspan="4">
+                <details>
+                    <summary>Build Log</summary>
+                    <pre class="build-log">{{ proj.build_log }}</pre>
+                </details>
+            </td>
+        </tr>
+        {% endif %}
+        {% else %}
+        <tr><td colspan="4" class="empty-state">No projects found. Generate one first.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

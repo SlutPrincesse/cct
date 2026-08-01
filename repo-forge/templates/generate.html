@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}RepoForge - Generate{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Generate Application</h1>
+    <p>Create a new app from selected code units</p>
+</div>
+
+<div class="card">
+    <form id="generateForm" class="form">
+        <div class="form-group">
+            <label>Project Name</label>
+            <input type="text" name="project_name" placeholder="my-app" required>
+        </div>
+        <div class="form-group">
+            <label>Description</label>
+            <textarea name="description" placeholder="What does this app do?" rows="3"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Generate App</button>
+    </form>
+    <div id="generateStatus" class="status-message"></div>
+</div>
+
+<div class="card">
+    <h2>Selected Units ({{ units|length }})</h2>
+    {% if units %}
+    <div class="units-preview">
+        {% for unit in units %}
+        <div class="unit-chip">
+            <span class="badge badge-{{ unit.type }}">{{ unit.type }}</span>
+            {{ unit.name }}
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="empty-state">No units selected. Go to <a href="/select">Select</a> to choose units.</p>
+    {% endif %}
+</div>
+{% endblock %}

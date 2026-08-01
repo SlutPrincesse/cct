@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}RepoForge - Home{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <h1>RepoForge</h1>
+    <p class="hero-subtitle">Clone, Analyze, Select, Generate, Compile</p>
+    <div class="hero-actions">
+        <a href="/clone" class="btn btn-primary">Clone Repository</a>
+        <a href="/analyze" class="btn btn-secondary">Analyze Code</a>
+        <a href="/select" class="btn btn-secondary">Select Units</a>
+    </div>
+</div>
+
+<div class="grid-2">
+    <div class="card">
+        <h2>Cloned Repositories</h2>
+        {% if repos %}
+        <table class="table">
+            <thead><tr><th>Name</th><th>Branch</th><th>Actions</th></tr></thead>
+            <tbody>
+            {% for repo in repos %}
+            <tr>
+                <td>{{ repo.name }}</td>
+                <td>{{ repo.branch }}</td>
+                <td><button class="btn btn-danger btn-sm" onclick="deleteRepo('{{ repo.name }}')">Delete</button></td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="empty-state">No repositories cloned yet.</p>
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <h2>Generated Projects</h2>
+        {% if projects %}
+        <table class="table">
+            <thead><tr><th>Name</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody>
+            {% for proj in projects %}
+            <tr>
+                <td>{{ proj.name }}</td>
+                <td><span class="badge badge-{{ proj.build_status }}">{{ proj.build_status }}</span></td>
+                <td><a href="/compile" class="btn btn-sm btn-secondary">Compile</a></td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="empty-state">No projects generated yet.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
